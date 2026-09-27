@@ -2,7 +2,6 @@ package com.alessandro.grocerylist
 
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.core.content.ContextCompat
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +15,7 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -143,12 +143,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         private fun applyCheckedStyle(textView: TextView, checked: Boolean) {
+            val colorRes = if (checked) R.color.item_text_checked else R.color.item_text
+            textView.setTextColor(ContextCompat.getColor(textView.context, colorRes))
             if (checked) {
                 textView.paintFlags = textView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                textView.setTextColor(Color.GRAY)
             } else {
                 textView.paintFlags = textView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                textView.setTextColor(Color.BLACK)
             }
         }
     }

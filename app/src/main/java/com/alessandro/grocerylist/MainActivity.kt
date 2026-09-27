@@ -17,6 +17,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -58,10 +59,11 @@ class MainActivity : AppCompatActivity() {
 
         itemInput = findViewById(R.id.itemInput)
         val addButton = findViewById<Button>(R.id.addButton)
-        val shareButton = findViewById<Button>(R.id.shareButton)
-        val backupButton = findViewById<Button>(R.id.backupButton)
-        val restoreButton = findViewById<Button>(R.id.restoreButton)
+        val shareButton = findViewById<ImageButton>(R.id.shareButton)
+        val backupButton = findViewById<ImageButton>(R.id.backupButton)
+        val restoreButton = findViewById<ImageButton>(R.id.restoreButton)
         val recyclerView = findViewById<RecyclerView>(R.id.itemList)
+
 
         loadItems()
         adapter = ItemAdapter()

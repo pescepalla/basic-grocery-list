@@ -2,7 +2,7 @@ package com.alessandro.grocerylist
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Color
+import androidx.core.content.ContextCompat
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater

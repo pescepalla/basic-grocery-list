@@ -100,13 +100,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun exportList() {
-        if (items.isEmpty()) {
-            Toast.makeText(this, "List is empty", Toast.LENGTH_SHORT).show()
+        val needed = items.filter { !it.checked }
+        if (needed.isEmpty()) {
+            Toast.makeText(this, "Nothing left to buy", Toast.LENGTH_SHORT).show()
             return
         }
-        val text = items.joinToString("\n") { item ->
-            (if (item.checked) "[x] " else "[ ] ") + item.name
-        }
+        val text = needed.joinToString("\n") { it.name }
         val sendIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_SUBJECT, "Grocery List")

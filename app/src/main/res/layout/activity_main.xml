@@ -6,14 +6,50 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Grocery List"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorPrimary"
-        android:layout_marginBottom="16dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Grocery List"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary" />
+
+        <ImageButton
+            android:id="@+id/shareButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_share"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Share list" />
+
+        <ImageButton
+            android:id="@+id/backupButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_backup"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Backup list" />
+
+        <ImageButton
+            android:id="@+id/restoreButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_restore"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Restore list" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,39 +87,5 @@
         android:layout_marginTop="12dp"
         android:clipToPadding="false"
         android:clipChildren="false" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/shareButton"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Share" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/backupButton"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:text="Backup" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/restoreButton"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:text="Restore" />
-
-    </LinearLayout>
 
 </LinearLayout>

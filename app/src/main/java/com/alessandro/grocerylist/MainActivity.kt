@@ -15,15 +15,16 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButtonToggleGroup
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -35,6 +36,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ItemAdapter
     private lateinit var prefs: SharedPreferences
     private lateinit var itemInput: EditText
+
+    /** false = "Needed" view (unchecked only), true = "All" view (everything, checked included). */
+    private var showAll = false
 
     companion object {
         private const val PREFS_NAME = "grocery_prefs"
@@ -63,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         val backupButton = findViewById<ImageButton>(R.id.backupButton)
         val restoreButton = findViewById<ImageButton>(R.id.restoreButton)
         val recyclerView = findViewById<RecyclerView>(R.id.itemList)
-
+        val viewToggleGroup = findViewById<MaterialButtonToggleGroup>(R.id.viewToggleGroup)
 
         loadItems()
         adapter = ItemAdapter()
@@ -71,6 +75,13 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
 
         ItemTouchHelper(SwipeCallback()).attachToRecyclerView(recyclerView)
+
+        viewToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                showAll = checkedId == R.id.allButton
+                adapter.notifyDataSetChanged()
+            }
+        }
 
         addButton.setOnClickListener {
             val text = itemInput.text.toString().trim()
@@ -95,10 +106,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Unchecked items first (in their existing order), checked items after. */
+    /** The full list, filtered to what the current toggle should show. */
+    private fun visibleItems(): List<GroceryItem> =
+        if (showAll) items else items.filter { !it.checked }
+
+    /** Sorts the full list: unchecked first (alphabetical), checked after (alphabetical). */
     private fun sortAndRefresh() {
-        val unchecked = items.filter { !it.checked }
-        val checked = items.filter { it.checked }
+        val unchecked = items.filter { !it.checked }.sortedBy { it.name.lowercase() }
+        val checked = items.filter { it.checked }.sortedBy { it.name.lowercase() }
         items.clear()
         items.addAll(unchecked)
         items.addAll(checked)
@@ -214,10 +229,10 @@ class MainActivity : AppCompatActivity() {
             return ViewHolder(view)
         }
 
-        override fun getItemCount(): Int = items.size
+        override fun getItemCount(): Int = visibleItems().size
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = items[position]
+            val item = visibleItems()[position]
 
             // Avoid firing the listener while we set the checkbox state on bind.
             holder.checkBox.setOnCheckedChangeListener(null)
@@ -247,14 +262,20 @@ class MainActivity : AppCompatActivity() {
             val position = viewHolder.bindingAdapterPosition
             if (position == RecyclerView.NO_POSITION) return
 
+            val visible = visibleItems()
+            if (position >= visible.size) return
+            val item = visible[position]
+            val realIndex = items.indexOfFirst { it === item }
+            if (realIndex == -1) return
+
             when (direction) {
                 ItemTouchHelper.LEFT -> {
-                    items.removeAt(position)
+                    items.removeAt(realIndex)
                     adapter.notifyItemRemoved(position)
                     saveItems()
                 }
                 ItemTouchHelper.RIGHT -> {
-                    val item = items.removeAt(position)
+                    items.removeAt(realIndex)
                     adapter.notifyItemRemoved(position)
                     saveItems()
                     editItem(item)

@@ -1,5 +1,6 @@
 package com.alessandro.grocerylist
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Canvas
@@ -9,6 +10,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private val items = mutableListOf<GroceryItem>()
     private lateinit var adapter: ItemAdapter
     private lateinit var prefs: SharedPreferences
+    private lateinit var itemInput: EditText
 
     companion object {
         private const val PREFS_NAME = "grocery_prefs"
@@ -41,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
-        val input = findViewById<EditText>(R.id.itemInput)
+        itemInput = findViewById(R.id.itemInput)
         val addButton = findViewById<Button>(R.id.addButton)
         val exportButton = findViewById<Button>(R.id.exportButton)
         val recyclerView = findViewById<RecyclerView>(R.id.itemList)
@@ -54,12 +57,12 @@ class MainActivity : AppCompatActivity() {
         ItemTouchHelper(SwipeCallback()).attachToRecyclerView(recyclerView)
 
         addButton.setOnClickListener {
-            val text = input.text.toString().trim()
+            val text = itemInput.text.toString().trim()
             if (text.isNotEmpty()) {
                 items.add(GroceryItem(text))
                 sortAndRefresh()
                 saveItems()
-                input.text.clear()
+                itemInput.text.clear()
             }
         }
 
@@ -113,6 +116,15 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(sendIntent, "Export list via"))
     }
 
+    /** Pulls an item's text back into the top input field so the user can edit and re-add it. */
+    private fun editItem(item: GroceryItem) {
+        itemInput.setText(item.name)
+        itemInput.setSelection(itemInput.text.length)
+        itemInput.requestFocus()
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(itemInput, InputMethodManager.SHOW_IMPLICIT)
+    }
+
     private fun applyCheckedStyle(textView: TextView, checked: Boolean) {
         val colorRes = if (checked) R.color.item_text_checked else R.color.item_text
         textView.setTextColor(ContextCompat.getColor(textView.context, colorRes))
@@ -155,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Swipe right to toggle checked, swipe left to delete. */
+    /** Swipe right to edit (moves the item back into the input field), swipe left to delete. */
     private inner class SwipeCallback :
         ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
@@ -176,9 +188,10 @@ class MainActivity : AppCompatActivity() {
                     saveItems()
                 }
                 ItemTouchHelper.RIGHT -> {
-                    items[position].checked = !items[position].checked
-                    sortAndRefresh()
+                    val item = items.removeAt(position)
+                    adapter.notifyItemRemoved(position)
                     saveItems()
+                    editItem(item)
                 }
             }
         }
@@ -203,12 +216,12 @@ class MainActivity : AppCompatActivity() {
 
             when {
                 dX > 0 -> {
-                    paint.color = ContextCompat.getColor(itemView.context, R.color.swipe_check_bg)
+                    paint.color = ContextCompat.getColor(itemView.context, R.color.swipe_edit_bg)
                     val rect = RectF(itemView.left.toFloat(), itemView.top.toFloat(), itemView.left + dX, itemView.bottom.toFloat())
                     c.drawRoundRect(rect, radius, radius, paint)
 
                     if (dX > iconSize + iconMargin * 2) {
-                        val icon = ContextCompat.getDrawable(itemView.context, R.drawable.ic_check_white)
+                        val icon = ContextCompat.getDrawable(itemView.context, R.drawable.ic_edit_white)
                         icon?.let {
                             val top = itemView.top + (itemView.height - iconSize) / 2
                             val left = itemView.left + iconMargin

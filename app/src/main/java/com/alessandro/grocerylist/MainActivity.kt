@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         val restoreButton = findViewById<ImageButton>(R.id.restoreButton)
         val recyclerView = findViewById<RecyclerView>(R.id.itemList)
         val viewToggleGroup = findViewById<MaterialButtonToggleGroup>(R.id.viewToggleGroup)
+        val addRow = findViewById<View>(R.id.addRow)
 
         loadItems()
         adapter = ItemAdapter()
@@ -79,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         viewToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 showAll = checkedId == R.id.allButton
+                addRow.visibility = if (showAll) View.VISIBLE else View.GONE
                 adapter.notifyDataSetChanged()
             }
         }
@@ -251,6 +253,17 @@ class MainActivity : AppCompatActivity() {
     /** Swipe right to edit (moves the item back into the input field), swipe left to delete. */
     private inner class SwipeCallback :
         ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+
+        override fun getSwipeDirs(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            return if (showAll) {
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            } else {
+                ItemTouchHelper.LEFT
+            }
+        }
 
         override fun onMove(
             recyclerView: RecyclerView,

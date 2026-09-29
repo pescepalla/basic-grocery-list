@@ -71,8 +71,8 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="24dp"
-            app:insetTop="0dp"
-            app:insetBottom="0dp" />
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/allButton"
@@ -85,8 +85,8 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="24dp"
-            app:insetTop="0dp"
-            app:insetBottom="0dp" />
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

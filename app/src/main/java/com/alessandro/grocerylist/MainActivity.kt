@@ -88,9 +88,23 @@ class MainActivity : AppCompatActivity() {
         addButton.setOnClickListener {
             val text = itemInput.text.toString().trim()
             if (text.isNotEmpty()) {
-                items.add(GroceryItem(text))
-                sortAndRefresh()
-                saveItems()
+                val existing = items.find { it.name.equals(text, ignoreCase = true) }
+                when {
+                    existing == null -> {
+                        items.add(GroceryItem(text))
+                        sortAndRefresh()
+                        saveItems()
+                    }
+                    existing.checked -> {
+                        existing.checked = false
+                        sortAndRefresh()
+                        saveItems()
+                        Toast.makeText(this, "\"${existing.name}\" marked as needed again", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        Toast.makeText(this, "\"${existing.name}\" is already on the list", Toast.LENGTH_SHORT).show()
+                    }
+                }
                 itemInput.text.clear()
             }
         }

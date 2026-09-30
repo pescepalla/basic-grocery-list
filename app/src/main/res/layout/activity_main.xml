@@ -31,12 +31,12 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Share list" />
 
-        <ImageButton
+       <ImageButton
             android:id="@+id/backupButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="8dp"
-            android:src="@drawable/ic_backup"
+            android:src="@drawable/ic_restore"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Backup list" />
 
@@ -45,11 +45,11 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="8dp"
-            android:src="@drawable/ic_restore"
+            android:src="@drawable/ic_backup"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Restore list" />
-
-    </LinearLayout>
+        
+        </LinearLayout>
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/viewToggleGroup"

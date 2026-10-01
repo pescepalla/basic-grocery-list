@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.view.HapticFeedbackConstants
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -258,8 +259,25 @@ class MainActivity : AppCompatActivity() {
 
             holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
                 item.checked = isChecked
-                sortAndRefresh()
-                saveItems()
+                if (isChecked) {
+                    holder.itemView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    holder.itemView.animate()
+                        .scaleX(0.96f)
+                        .scaleY(0.96f)
+                        .setDuration(90)
+                        .withEndAction {
+                            holder.itemView.animate().scaleX(1f).scaleY(1f).setDuration(90).start()
+                        }
+                        .start()
+                    holder.itemView.postDelayed({
+                        sortAndRefresh()
+                        saveItems()
+                    }, 180)
+                } else {
+                    sortAndRefresh()
+                    saveItems()
+                }
+            }
             }
         }
     }

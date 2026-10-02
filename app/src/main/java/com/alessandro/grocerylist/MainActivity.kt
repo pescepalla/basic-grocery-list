@@ -22,6 +22,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +41,9 @@ class MainActivity : AppCompatActivity() {
 
     /** false = "Needed" view (unchecked only), true = "All" view (everything, checked included). */
     private var showAll = false
+
+    /** Live fuzzy-search text from the Add field; only applied while in "All" mode. */
+    private var searchQuery = ""
 
     companion object {
         private const val PREFS_NAME = "grocery_prefs"
@@ -82,8 +86,17 @@ class MainActivity : AppCompatActivity() {
             if (isChecked) {
                 showAll = checkedId == R.id.allButton
                 addRow.visibility = if (showAll) View.VISIBLE else View.GONE
+                if (!showAll) {
+                    searchQuery = ""
+                    itemInput.text?.clear()
+                }
                 adapter.notifyDataSetChanged()
             }
+        }
+
+        itemInput.doOnTextChanged { text, _, _, _ ->
+            searchQuery = text?.toString()?.trim() ?: ""
+            adapter.notifyDataSetChanged()
         }
 
         addButton.setOnClickListener {
@@ -123,9 +136,45 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** The full list, filtered to what the current toggle should show. */
-    private fun visibleItems(): List<GroceryItem> =
-        if (showAll) items else items.filter { !it.checked }
+    /** The full list, filtered to what the current toggle should show, then narrowed by search. */
+    private fun visibleItems(): List<GroceryItem> {
+        val base = if (showAll) items else items.filter { !it.checked }
+        if (!showAll || searchQuery.isBlank()) return base
+        return base.mapNotNull { item -> fuzzyScore(searchQuery, item.name)?.let { score -> item to score } }
+            .sortedByDescending { it.second }
+            .map { it.first }
+    }
+
+    /**
+     * fzf-style fuzzy match: every character of [query] must appear in [target], in order,
+     * but not necessarily adjacent. Returns null if it doesn't match at all. Higher score is
+     * a better match; consecutive runs and matches right after a word boundary score higher.
+     */
+    private fun fuzzyScore(query: String, target: String): Int? {
+        val q = query.lowercase()
+        val t = target.lowercase()
+        if (q.isEmpty()) return 0
+
+        var qi = 0
+        var score = 0
+        var consecutive = 0
+        var lastMatchIndex = -2
+
+        for (ti in t.indices) {
+            if (qi >= q.length) break
+            if (t[ti] == q[qi]) {
+                consecutive = if (lastMatchIndex == ti - 1) consecutive + 1 else 1
+                score += 1 + consecutive * 2
+                if (ti == 0 || t[ti - 1] == ' ' || t[ti - 1] == '/' || t[ti - 1] == '-') {
+                    score += 5
+                }
+                lastMatchIndex = ti
+                qi++
+            }
+        }
+
+        return if (qi == q.length) score else null
+    }
 
     /** Sorts the full list: unchecked first (alphabetical), checked after (alphabetical). */
     private fun sortAndRefresh() {

@@ -31,7 +31,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Share list" />
 
-       <ImageButton
+        <ImageButton
             android:id="@+id/backupButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -48,8 +48,8 @@
             android:src="@drawable/ic_backup"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Restore list" />
-        
-        </LinearLayout>
+
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/viewToggleGroup"
@@ -99,11 +99,11 @@
         android:visibility="gone">
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Add an item">
+            android:hint="Add or search items">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/itemInput"
